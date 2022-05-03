@@ -88,6 +88,12 @@ fn reduce_target_files(template: &PathBuf, iteration_template: &PathBuf, dist_fi
         let dir_entry = dir_entry.unwrap();
         let dir_entry_path = dir_entry.path();
         let dir_entry_filename = dir_entry_path.file_stem().unwrap().to_str().unwrap();
+        let dist_filename = dist_filename.file_stem().unwrap().to_str().unwrap();
+
+        if dist_filename == dir_entry_filename {
+            continue
+        }
+
         let dir_content = fs::read_to_string(&dir_entry_path).unwrap();
         let wait_for_insert_content = stem_regex.replace_all(&iteration_template_content, dir_entry_filename).into_owned();
         let wait_for_insert_content = template_regex.replace_all(wait_for_insert_content.as_str(), dir_content).into_owned();
