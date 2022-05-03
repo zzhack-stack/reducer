@@ -2,6 +2,7 @@
 name = "reducer"
 version = "0.1.0"
 edition = "2021"
+description = "A CLI tool to translate files by templates"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
