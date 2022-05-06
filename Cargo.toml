@@ -1,6 +1,6 @@
 [package]
 name = "rapper"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "A CLI tool to translate files by templates"
 keywords = ["cli"]
