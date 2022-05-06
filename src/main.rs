@@ -42,6 +42,7 @@ enum Action {
 
 const TEMPLATE_REPLACE_VARIABLE: &'static str = r#"\{\{TEMPLATE\}\}"#;
 const FILENMAE_REPLACE_VARIABLE: &'static str = r#"\{\{STEM\}\}"#;
+const TRAVERSE_COUNT_REPLACE_VARIABLE: &'static str = r#"\{\{TRAVERSE_COUNT\}\}"#;
 
 fn filter_target_files(target: &PathBuf, target_extension: &str) -> Vec<Result<DirEntry, Error>> {
     let dir = fs::read_dir(target).expect("Please make sure the target directory exists");
@@ -79,10 +80,12 @@ fn translate_target_files(template: &PathBuf, dist: &PathBuf, target: &PathBuf, 
 fn reduce_target_files(template: &PathBuf, iteration_template: &PathBuf, dist_filename: &PathBuf, target: &PathBuf, target_extension: &str){
     let template_regex = Regex::new(TEMPLATE_REPLACE_VARIABLE).unwrap();
     let stem_regex = Regex::new(FILENMAE_REPLACE_VARIABLE).unwrap();
+    let traverse_count_regex = Regex::new(TRAVERSE_COUNT_REPLACE_VARIABLE).unwrap();
     let template_content = fs::read_to_string(template).expect("Please make sure the template file exists");
     let iteration_template_content = fs::read_to_string(iteration_template).expect("Please make sure the iteration template file exists");
     let dir = filter_target_files(target, target_extension);
     let mut wait_for_insert_template_content = "".to_string();
+    let traverse_count = dir.len();
 
     for dir_entry in dir {
         let dir_entry = dir_entry.unwrap();
@@ -98,10 +101,12 @@ fn reduce_target_files(template: &PathBuf, iteration_template: &PathBuf, dist_fi
         let wait_for_insert_content = stem_regex.replace_all(&iteration_template_content, dir_entry_filename).into_owned();
         let wait_for_insert_content = template_regex.replace_all(wait_for_insert_content.as_str(), dir_content).into_owned();
 
+
         wait_for_insert_template_content += wait_for_insert_content.as_str();
     }
 
     let dist_content = template_regex.replace_all(&template_content, &wait_for_insert_template_content).into_owned();
+    let dist_content = traverse_count_regex.replace_all(dist_content.as_str(), traverse_count.to_string()).into_owned();
 
     fs::write(&dist_filename, dist_content.as_str()).unwrap();
 }
